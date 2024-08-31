@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 0.0.2
+### Script Version 0.0.3
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -25,7 +25,7 @@ $CSInfoFilePath = "$PSScriptRoot\MyPluginInfo.cs"
 
 # README output path for github. 
 # For output to project dir, use: "$PSScriptRoot\README.md"
-# For output to solutionDir, use: "$SolutionDirREADME.md"
+# For output to solution Dir, use: "$SolutionDir\README.md"
 $ProjectReadmeFileOutPath = "$SolutionDir\README.md"
 
 
