@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCMTemplate", "VoidManagerTemplate\VCMTemplate.csproj", "{22D5FF86-3482-4945-97B4-AAC0E20E68CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCMTemplate", "VCMTemplate\VCMTemplate.csproj", "{22D5FF86-3482-4945-97B4-AAC0E20E68CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
