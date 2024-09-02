@@ -5,88 +5,160 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 0.0.3
+### Script Version 0.0.6
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
 ###
 ###
 
-
-
 param ($OutputDir, $SolutionDir)
-
 $ReleaseFilesDir = "$PSScriptRoot\ReleaseFiles"
 $ManifestFilePath = "$ReleaseFilesDir\manifest.json"
 $ReadmeFilePath = "$ReleaseFilesDir\README.md"
 $ChangelogFilePath = "$ReleaseFilesDir\CHANGELOG.md"
 $IconFilePath = "$ReleaseFilesDir\icon.png"
 $CSInfoFilePath = "$PSScriptRoot\MyPluginInfo.cs"
-
-# README output path for github. 
-# For output to project dir, use: "$PSScriptRoot\README.md"
-# For output to solution Dir, use: "$SolutionDir\README.md"
-$ProjectReadmeFileOutPath = "$SolutionDir\README.md"
+$ConfigFilePath = "$PSScriptRoot\ReleaseFiles\ReleaseConfig.config"
 
 
-## INTERNAL NOTE - Move variable entry to props file. If users update their mod settings by re-importing their PreBuild file, they will lose all settings.
+### Sets XML text, Creates XML entry if non-existant. Requires CSProjXML var set
+function Set-XMLText
+{
+    param ( $ParentPath, $NodeName, $Text )
+
+    $TargetNode = $Script:CSProjXML.SelectSingleNode("$ParentPath/$NodeName")
+    if($TargetNode)
+    {
+        $TargetNode.InnerText = $Text
+    }
+    else
+    {
+        Write-Host ("Creating XML Node $NodeName")
+        $XMLElement = $Script:CSProjXML.CreateElement($NodeName)
+        $XMLElement.InnerXml = $Text
+        $ParentNode = $Script:CSProjXML.SelectSingleNode("$ParentPath")
+        $_ = $ParentNode.AppendChild($XMLElement)
+    }
+}
+
+### Simple INI reader. Credit to https://devblogs.microsoft.com/scripting/use-powershell-to-work-with-any-ini-file/
+function Get-IniContent ($FilePath)
+{
+    $ini = @{}
+    switch -regex -File $FilePath
+    {
+        “^\[(.+)\]” # Section
+        {
+            $section = $matches[1]
+            $ini[$section] = @{}
+            $CommentCount = 0
+        }
+        “^(;.*)$” # Comment
+        {
+            $value = $matches[1]
+            $CommentCount = $CommentCount + 1
+            $name = “Comment” + $CommentCount
+            $ini[$section][$name] = $value
+        }
+        “(.+?)\s*=(.*)” # Key
+        {
+            $name,$value = $matches[1..2]
+            $ini[$section][$name] = $value
+        }
+    }
+    return $ini
+}
+
+$ConfigData = Get-IniContent($ConfigFilePath)
+
+
+
 ### Input Vars
-## Value assignments start here
 
 # Leave blank for auto GUID (OAthor.Name)
-$GUID = "" 
+$GUID = $ConfigData["ReleaseProperties"]["GUID"]
 
 # The name of the mod, used for AutoGUID, FileName, and anything else which needs a file-friendly name. Leave blank to use existing data.
-$PluginName = ""
+$PluginName = $ConfigData["ReleaseProperties"]["PluginName"]
 
 # User friendly name of the mod. Used for thunderstore and BepinPlugin names visible to users. Leave blank to use the PluginName.
-$UserPluginName = ""
+$UserPluginName = $ConfigData["ReleaseProperties"]["UserPluginName"]
+
+$ThunderstorePluginName = $ConfigData["ReleaseProperties"]["ThunderstorePluginName"]
 
 # The current version of the mod. Used for file version, BepinPlugin, and Thunderstore manifest.
-$PluginVersion = "1.0.0"
+$PluginVersion = $ConfigData["ReleaseProperties"]["PluginVersion"]
 
 # The version of VoidManager utilized by the mod.
-$VoidManagerVersion = "1.1.7"
+$VoidManagerVersion = $ConfigData["ReleaseProperties"]["VoidManagerVersion"]
 
 # The version of Void Crew the mod is built for.
-$GameVersion = "0.26.3"
+[string]$GameVersion = $ConfigData["ReleaseProperties"]["GameVersion"]
 
 # The simple description of the mod, used for VoidManager and thunderstore manifest descriptions. Must be less than 250 Characters
-$PluginDescription = ""
+[string]$PluginDescription = $ConfigData["ReleaseProperties"]["PluginDescription"]
 
 # The original author of the mod, used for auto GUID.
-$PluginOriginalAuthor = ""
+$PluginOriginalAuthor = $ConfigData["ReleaseProperties"]["PluginOriginalAuthor"]
 
 # The various authors/editors of the mod.
-$PluginAuthors = "$PluginOriginalAuthor"
+$PluginAuthors = $ConfigData["ReleaseProperties"]["PluginAuthors"]
 
 # Github Link
-$GithubLink = ""
+[string]$WebpageLink = $ConfigData["ReleaseProperties"]["GithubLink"]
 
-# NOT IMPLEMENTED. FOR FUTURE VOIDMANAGER FEATURE.
-# ThunderStore ID (https://thunderstore.io/c/void-crew/p/VoidCrewModdingTeam/VoidManager/ the section equivelant to 'VoidCrewModdingTeam/VoidManager')
-$ThunderStoreID = ""
+# FOR FUTURE VOIDMANAGER FEATURE.
+# ThunderStore ID (https://thunderstore.io/c/void-crew/p/VoidCrewModdingTeam/VoidManager/ the section equivelant to 'VoidCrewModdingTeam/VoidManager'). Leave blank if unknown.
+$ThunderstoreID = $ConfigData["ReleaseProperties"]["ThunderstoreID"]
 
 
-### PreBuild Execution Params
+
+## PreBuild Execution Params
+
+# README output path for github readme. 
+# For output to project dir, use: "$PSScriptRoot\README.md"
+# For output to solution Dir, use: "$SolutionDir\README.md"
+$ProjectReadmeFileOutPath = $ConfigData["PrebuildExecParams"]["ProjectReadmeOutPath"]
+if ($ProjectReadmeFileOutPath -eq "SolutionDir")
+{
+    $ProjectReadmeFileOutPath = "$SolutionDir\README.md"
+}
+elseif($ProjectReadmeFileOutPath -eq "ProjectDir")
+{
+    $ProjectReadmeFileOutPath = "$PSScriptRoot\README.md"
+}
 
 # Throw error if icon.png does not exist.
-$IconError = $false
+$IconError = $ConfigData["PrebuildExecParams"]["IconError"] -eq "True"
 
 # Throw error if CHANGELOG is not updated.
-$ChangelogError = $true
+$ChangelogError = $ConfigData["PrebuildExecParams"]["ChangelogError"] -eq "True"
 
-## Value assignments end here.
 ## Edit beyond at your own peril...
+
 
 Write-Output "Starting Prebuild..."
 
-# ERROR CODE 2 - Exit early if description is too long
+
+### Data Validation
+
+# Auto-Fill blank description
+if(-not $PluginDescription) { $PluginDescription = $PluginName }
+
+# Exit early if description is too long
 if($PluginDescription.Length -gt 250)
 {
 	Write-Warning "PluginDescription is too long. Must be less than 250 characters."
 	Exit 2
 }
+
+# Thunderstore Plugin Name
+if(-not $ThunderstorePluginName)
+{
+    $ThunderstorePluginName = $UserPluginName.Replace(" ", "_")
+}
+
 
 ### Update .csproj file.
 Write-Output "Updating CSProj file..."
@@ -95,25 +167,31 @@ $CSProjDir = (@(Get-ChildItem -Path ($PSScriptRoot + "\*.csproj"))[0])
 $CSProjXML = [xml](Get-Content -Path $CSProjDir.FullName)
 
 # Set Version
-$TargetNode = $CSProjXML.SelectSingleNode("//Project/PropertyGroup/Version")
-$TargetNode.'#text' = $PluginVersion
+Set-XMLText "//Project/PropertyGroup" "Version" $PluginVersion
 
+# Get DefaultNameSpace for MyPluginInfo.cs generation
 $TargetNode = $CSProjXML.SelectSingleNode("//Project/PropertyGroup/RootNamespace")
-$DefaultNamespace = $TargetNode.'#text'
+$DefaultNamespace = $TargetNode.InnerText
+
 
 # Set AssemblyName
 $AssemblyNameXMLNode = $CSProjXML.SelectSingleNode("//Project/PropertyGroup/AssemblyName")
-if(-Not $PluginName)
-{
-	# Auto-Fill Plugin Name.
-	$PluginName = $AssemblyNameXMLNode.'#text'
-}
-if($AssemblyNameXMLNode.'#text' -ne $PluginName)
-{
-	$AssemblyNameXMLNode.'#text' = $PluginName
-}
+
+# Auto-Fill emlpty Plugin Name.
+if(-Not $PluginName) { $PluginName = $AssemblyNameXMLNode.InnerText }
+else { $AssemblyNameXMLNode.InnerText = $PluginName }
+
+
+# Set File Description
+Set-XMLText "//Project/PropertyGroup" "AssemblyTitle" $PluginDescription
+
+# Set Extra File Description.
+Set-XMLText "//Project/PropertyGroup" "Description" $PluginDescription
+
 
 $CSProjXML.Save($CSProjDir.FullName)
+
+
 
 
 # Auto-Fill UserPluginName if left blank. Must run after PluginName autofill.
@@ -121,8 +199,6 @@ if(-Not $UserPluginName)
 {
 	$UserPluginName = $PluginName
 }
-
-
 
 
 ### Create/Update MyPluginInfo.cs
@@ -135,6 +211,11 @@ if($GUID)
 }
 else
 {
+    if(-not $PluginOriginalAuthor)
+    {
+        Write-Warning "Original Author must be filled in if using GUID auto-fill."
+        Exit 5
+    }
 	$InfoFileContent += "`r`n        public const string PLUGIN_GUID = $`"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}`";"
 }
 $InfoFileContent += "`r`n        public const string PLUGIN_NAME = `"" + $PluginName + "`";" 
@@ -142,6 +223,7 @@ $InfoFileContent += "`r`n        public const string PLUGIN_VERSION = `"" + $Plu
 $InfoFileContent += "`r`n        public const string PLUGIN_DESCRIPTION = `"" + $PluginDescription + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_ORIGINAL_AUTHOR = `"" + $PluginOriginalAuthor + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_AUTHORS = `"" + $PluginAuthors + "`";"
+$InfoFileContent += "`r`n        public const string PLUGIN_THUNDERSTORE_ID = `"" + $ThunderstoreID + "`";"
 $InfoFileContent += "`r`n    }`r`n}"
 Set-Content -LiteralPath $CSInfoFilePath -Value $InfoFileContent
 
@@ -154,13 +236,13 @@ Write-Output "Starting work on Template Files..."
 ## Manifest file
 Write-Output "Updating manifiest.json..."
 
-$ManifestData = Get-Content -Path $ManifestFilePath | ConvertFrom-Json
-$ManifestData.name = $UserPluginName
+$ManifestData = Get-Content -Path $ManifestFilePath -Encoding UTF8 | ConvertFrom-Json
+$ManifestData.name = $ThunderstorePluginName
 $ManifestData.version_number = $PluginVersion
-$ManifestData.website_url = $GithubLink
+$ManifestData.website_url = $WebpageLink
 $ManifestData.description = $PluginDescription
 $ManifestData.dependencies = ([string]$ManifestData.dependencies).Replace("[VoidManagerVersion]", $VoidManagerVersion).Split(', ')
-ConvertTo-Json $ManifestData | Out-File -FilePath "$OutputDir\manifest.json"
+ConvertTo-Json $ManifestData | % { [System.Text.RegularExpressions.Regex]::Unescape($_) } | Out-File -FilePath "$OutputDir\manifest.json" -Encoding UTF8
 
 
 
@@ -175,29 +257,36 @@ $ReadmeData = $ReadmeData.Replace("[Authors]", $PluginAuthors)
 $ReadmeData = $ReadmeData.Replace("[VoidManagerVersion]", $VoidManagerVersion)
 $ReadmeData = $ReadmeData.Replace("[UserModName]", $UserPluginName)
 $ReadmeData = $ReadmeData.Replace("[ModName]", $PluginName)
+$ReadmeData = $ReadmeData.Replace("[Description]", $PluginDescription)
 
-#Write README to Output folder
+# Write README to Output folder
 $ReadmeData | Out-File -FilePath "$OutputDir\README.md" -Encoding utf8
 
-#Write 2nd README to Project Output folder for github
-$ReadmeData | Out-File -FilePath $ProjectReadmeFileOutPath -Encoding utf8
+# Write 2nd README to Project Output folder for github
+if($ProjectReadmeFileOutPath)
+{
+    $ReadmeData | Out-File -FilePath $ProjectReadmeFileOutPath -Encoding utf8
+}
 
 
 
 ## Changelog file
-Write-Output "Copying CHANGELOG.md..."
-
-$ChangelogData = Get-Content -Path $ChangelogFilePath
-if(-Not $ChangelogData.StartsWith("## $PluginVersion"))
+if(Test-Path -Path $ChangelogFilePath)
 {
-    Write-Warning "Changelog does not start with the current plugin version"
-	if($ChangelogError)
-	{
-		Exit 3
-	}
-}
+    Write-Output "Copying CHANGELOG.md..."
 
-Copy-Item -Path $ChangelogFilePath -Destination $OutputDir
+    $ChangelogData = Get-Content -Path $ChangelogFilePath
+    if(-Not $ChangelogData.StartsWith("## $PluginVersion"))
+    {
+        Write-Warning "Changelog does not start with the current plugin version"
+    	if($ChangelogError)
+    	{
+    		Exit 3
+    	}
+    }
+
+    Copy-Item -Path $ChangelogFilePath -Destination $OutputDir
+}
 
 
 
@@ -215,3 +304,5 @@ else
 		Exit 4
 	}
 }
+
+Write-Host "PreBuild Complete!"

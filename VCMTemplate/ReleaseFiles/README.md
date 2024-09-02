@@ -10,9 +10,11 @@ Developed by [Authors]
 Requires VoidManager [VoidManagerVersion]
 
 
+[Description]
+
 ---------------------
 
-### 💡 Function - **brief outline**
+### 💡 Function(s)
 
 - 
 
