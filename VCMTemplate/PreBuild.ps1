@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.0.0
+### Script Version 1.0.1
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -14,8 +14,8 @@
 
 param ($OutputDir, $SolutionDir)
 $ReleaseFilesDir = "$PSScriptRoot\ReleaseFiles"
-$ManifestFilePath = "$ReleaseFilesDir\manifest.json"
-$ReadmeFilePath = "$ReleaseFilesDir\README.md"
+$ManifestFilePath = "$ReleaseFilesDir\manifest_Template.json"
+$ReadmeFilePath = "$ReleaseFilesDir\README_Template.md"
 $ChangelogFilePath = "$ReleaseFilesDir\CHANGELOG.md"
 $IconFilePath = "$ReleaseFilesDir\icon.png"
 $CSInfoFilePath = "$PSScriptRoot\MyPluginInfo.cs"
