@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.0.1
+### Script Version 1.0.2
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -276,7 +276,7 @@ if(Test-Path -Path $ChangelogFilePath)
     Write-Output "Copying CHANGELOG.md..."
 
     $ChangelogData = Get-Content -Path $ChangelogFilePath
-    if(-Not $ChangelogData.StartsWith("## $PluginVersion"))
+    if(-Not $ChangelogData[0].StartsWith("## $PluginVersion"))
     {
         Write-Warning "Changelog does not start with the current plugin version"
     	if($ChangelogError)
