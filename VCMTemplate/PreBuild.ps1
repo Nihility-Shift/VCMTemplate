@@ -219,6 +219,7 @@ else
 	$InfoFileContent += "`r`n        public const string PLUGIN_GUID = $`"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}`";"
 }
 $InfoFileContent += "`r`n        public const string PLUGIN_NAME = `"" + $PluginName + "`";" 
+$InfoFileContent += "`r`n        public const string USERS_PLUGIN_NAME = `"" + $UserPluginName + "`";" 
 $InfoFileContent += "`r`n        public const string PLUGIN_VERSION = `"" + $PluginVersion + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_DESCRIPTION = `"" + $PluginDescription + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_ORIGINAL_AUTHOR = `"" + $PluginOriginalAuthor + "`";"

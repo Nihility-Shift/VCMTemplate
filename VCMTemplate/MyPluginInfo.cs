@@ -5,6 +5,7 @@ namespace VCMTemplate
     {
         public const string PLUGIN_GUID = $"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}";
         public const string PLUGIN_NAME = "VCMTemplate";
+        public const string USERS_PLUGIN_NAME = "";
         public const string PLUGIN_VERSION = "1.0.0";
         public const string PLUGIN_DESCRIPTION = "";
         public const string PLUGIN_ORIGINAL_AUTHOR = "Dragon";
