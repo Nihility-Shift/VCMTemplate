@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.0.3
+### Script Version 1.0.6
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -142,6 +142,9 @@ Write-Output "Starting Prebuild..."
 
 
 ### Data Validation
+
+# Auto-Fill blank Authors
+if(-not $PluginAuthors) { $PluginAuthors = $PluginOriginalAuthor }
 
 # Auto-Fill blank description
 if(-not $PluginDescription) { $PluginDescription = $PluginName }
