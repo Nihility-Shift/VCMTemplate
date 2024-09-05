@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.0.5
+### Script Version 1.0.6
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -111,6 +111,10 @@ $PluginAuthors = $ConfigData["ReleaseProperties"]["PluginAuthors"]
 # FOR FUTURE VOIDMANAGER FEATURE.
 # ThunderStore ID (https://thunderstore.io/c/void-crew/p/VoidCrewModdingTeam/VoidManager/ the section equivelant to 'VoidCrewModdingTeam/VoidManager'). Leave blank if unknown.
 $ThunderstoreID = $ConfigData["ReleaseProperties"]["ThunderstoreID"]
+
+# Dependency Strings, Comma Deliniated
+[string]$DependencyStrings = $ConfigData["ReleaseProperties"]["DependencyStrings"]
+
 
 
 
@@ -245,7 +249,8 @@ $ManifestData.name = $ThunderstorePluginName
 $ManifestData.version_number = $PluginVersion
 $ManifestData.website_url = $WebpageLink
 $ManifestData.description = $PluginDescription
-$ManifestData.dependencies = ([string]$ManifestData.dependencies).Replace("[VoidManagerVersion]", $VoidManagerVersion).Split(', ')
+$ManifestData.dependencies = $DependencyStrings.Replace("[VoidManagerVersion]", $VoidManagerVersion).Split(',').Trim();
+
 ConvertTo-Json $ManifestData | % { [System.Text.RegularExpressions.Regex]::Unescape($_) } | Out-File -FilePath "$OutputDir\manifest.json" -Encoding UTF8
 
 
