@@ -10,13 +10,11 @@ Developed by [Authors]
 Requires VoidManager [VoidManagerVersion]
 
 
-[Description]
-
 ---------------------
 
 ### 💡 Function(s)
 
-- 
+- [Description]
 
 ### 🎮 Client Usage
 
@@ -24,10 +22,14 @@ Requires VoidManager [VoidManagerVersion]
 
 ### 👥 Multiplayer Functionality
 
+
+# Note to mod developer: Remove all but one, and describe any custom functionality.
 - ✅ Client
   - Only the client needs this mod.
 - ✅ Host
   - Only the host needs this mod.
+- ✅ Session
+  - Requires the room to be marked as Mod_Session.
 - ✅ All
   - All players must have this mod installed.
 
