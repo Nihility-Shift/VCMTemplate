@@ -286,9 +286,9 @@ if(Test-Path -Path $ChangelogFilePath)
     Write-Output "Copying CHANGELOG.md..."
 
     $ChangelogData = Get-Content -Path $ChangelogFilePath
-    if(-Not $ChangelogData[0].StartsWith("## $PluginVersion"))
+    if(-Not $ChangelogData.Contains("## $PluginVersion"))
     {
-        Write-Warning "Changelog does not start with the current plugin version"
+        Write-Warning "Changelog does not contain an entry for the current plugin version"
     	if($ChangelogError)
     	{
     		Exit 3
