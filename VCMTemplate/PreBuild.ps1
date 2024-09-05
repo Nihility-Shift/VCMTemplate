@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.0.6
+### Script Version 1.0.7
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -106,7 +106,7 @@ $PluginOriginalAuthor = $ConfigData["ReleaseProperties"]["PluginOriginalAuthor"]
 $PluginAuthors = $ConfigData["ReleaseProperties"]["PluginAuthors"]
 
 # Github Link
-[string]$WebpageLink = $ConfigData["ReleaseProperties"]["GithubLink"]
+[string]$WebpageLink = $ConfigData["ReleaseProperties"]["WebpageLink"]
 
 # FOR FUTURE VOIDMANAGER FEATURE.
 # ThunderStore ID (https://thunderstore.io/c/void-crew/p/VoidCrewModdingTeam/VoidManager/ the section equivelant to 'VoidCrewModdingTeam/VoidManager'). Leave blank if unknown.
