@@ -241,18 +241,20 @@ Set-Content -LiteralPath $CSInfoFilePath -Value $InfoFileContent
 ### Auto-Fill Template Files
 Write-Output "Starting work on Template Files..."
 
+
+
 ## Manifest file
 Write-Output "Updating manifiest.json..."
 
-$ManifestData = Get-Content -Path $ManifestFilePath -Encoding UTF8 | ConvertFrom-Json
-$ManifestData.name = $ThunderstorePluginName
-$ManifestData.version_number = $PluginVersion
-$ManifestData.website_url = $WebpageLink
-$ManifestData.description = $PluginDescription
-$ManifestData.dependencies = $DependencyStrings.Replace("[VoidManagerVersion]", $VoidManagerVersion).Split(',').Trim();
-
+$Dependencies = $DependencyStrings.Split(',').Trim();
+$ManifestData = [ordered]@{
+    name = $ThunderstorePluginName
+    version_number = $PluginVersion
+    description = $PluginDescription
+    website_url = $WebpageLink
+    dependencies = $Dependencies
+}
 ConvertTo-Json $ManifestData | % { [System.Text.RegularExpressions.Regex]::Unescape($_) } | Out-File -FilePath "$OutputDir\manifest.json" -Encoding UTF8
-
 
 
 ## README file
