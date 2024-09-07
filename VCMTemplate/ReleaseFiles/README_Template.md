@@ -7,7 +7,7 @@
 Version [ModVersion]  
 For Game Version [GameVersion]  
 Developed by [Authors]  
-Requires VoidManager [VoidManagerVersion]
+Requires [Dependencies]
 
 
 ---------------------
