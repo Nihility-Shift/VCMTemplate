@@ -1,0 +1,10 @@
+﻿<Project>
+    <ItemGroup>
+		<ConfigFile Include="DefaultFiles\PluginInfo.config">
+	</ItemGroup>
+	<Target Name="ReadFromFile">
+		<ReadLinesFromFile File=@(ConfigFile)"">
+			<Output TaskParameter="Lines" ItemName="ItemsFromFile">
+		</ReadLinesFromFile>
+	</Target>
+</Project>
