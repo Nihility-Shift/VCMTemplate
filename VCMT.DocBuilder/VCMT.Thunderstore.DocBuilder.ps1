@@ -260,7 +260,7 @@ if(-not $ThunderstorePluginName)
 ### Create/Update MyPluginInfo.cs
 Write-Output "Auto-Filling MyPluginInfo.cs..."
 
-$InfoFileContent = "namespace $DefaultNamespace`r`n{`r`n    //Auto-Generated File. Created by PreBuild.ps1`r`n    public class MyPluginInfo`r`n    {"
+$InfoFileContent = "#pragma warning disable CS1591`r`namespace $DefaultNamespace`r`n{`r`n    //Auto-Generated File. Created by PreBuild.ps1`r`n    public class MyPluginInfo`r`n    {"
 if($GUID)
 {
 	$InfoFileContent += "`r`n        public const string PLUGIN_GUID = `"" + $GUID + "`";"
@@ -281,7 +281,7 @@ $InfoFileContent += "`r`n        public const string PLUGIN_DESCRIPTION = `"" + 
 $InfoFileContent += "`r`n        public const string PLUGIN_ORIGINAL_AUTHOR = `"" + $PluginOriginalAuthor + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_AUTHORS = `"" + $PluginAuthors + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_THUNDERSTORE_ID = `"" + $ThunderstoreID + "`";"
-$InfoFileContent += "`r`n    }`r`n}"
+$InfoFileContent += "`r`n    }`r`n}`r`n#pragma warning restore CS1591"
 Set-Content -LiteralPath $CSInfoFilePath -Value $InfoFileContent
 
 
