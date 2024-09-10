@@ -2,7 +2,7 @@
 	<PropertyGroup>
 	  <PackageId>VCMT.Thunderstore.DocBuilder</PackageId>
 	  <!-- Update DocBuilder.Props when incrimenting version. If someone has a better solution, lmk. -->
-	  <Version>0.1.1</Version>
+	  <Version>0.1.2</Version>
 	  <Authors>Void Crew Modding Team</Authors>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageProjectUrl>https://github.com/Void-Crew-Modding-Team/VCMTemplate</PackageProjectUrl>
