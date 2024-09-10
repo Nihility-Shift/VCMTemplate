@@ -44,6 +44,11 @@ $CSInfoFilePath = $ProjectDir + "MyPluginInfo.cs"
 
 
 ### Check Template and config files exist
+if (-not (Test-Path -PathType container $ReleaseFilesDir))
+{
+    New-Item -ItemType Directory -Path $ReleaseFilesDir | Out-Null
+}
+
 $FailCheck = $false
 if (-not (Test-Path $ReadmeFilePath))
 {
