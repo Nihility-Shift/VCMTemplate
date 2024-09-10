@@ -6,6 +6,6 @@
 			<!-- Update DocBuilder.Props when incrimenting version. If someone has a better solution, lmk. -->
 			<ScriptLocation Condition=" '$(ScriptLocation)'=='' ">$(NuGetPackageRoot)VCMT.Thunderstore.DocBuilder\0.1.2\build\VCMT.Thunderstore.DocBuilder.ps1</ScriptLocation>
 		</PropertyGroup>
-		<Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -file $(ScriptLocation) $(OutDir) $(SolutionDir) $(ProjectDir)" />
+		<Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -file &quot;$(ScriptLocation)&quot; &quot;$(OutDir)\&quot; &quot;$(SolutionDir)\&quot; &quot;$(ProjectDir)\&quot;" />
 	</Target>
 </Project>
