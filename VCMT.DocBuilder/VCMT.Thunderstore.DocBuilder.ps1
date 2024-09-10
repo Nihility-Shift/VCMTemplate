@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.1.0
+### Script Version 1.1.1
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
@@ -296,6 +296,10 @@ Write-Output "Starting work on Template Files..."
 Write-Output "Updating manifiest.json..."
 
 $Dependencies = $DependencyStrings.Split(',').Trim();
+if ($Dependencies.GetType().Name -eq "String") 
+{ 
+    $Dependencies = @($Dependencies)
+}
 $ManifestData = [ordered]@{
     name = $ThunderstorePluginName
     version_number = $PluginVersion
