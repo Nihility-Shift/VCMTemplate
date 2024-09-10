@@ -1,28 +1,74 @@
 ###
-### Void Crew Modding PreBuild Script
-### For use with VoidManager
+### Void Crew Modding DocBuilder Script
+### For general modding usage
 ###
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.0.7
+### Script Version 1.1.0
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
 ###
 ###
 
-param ($OutputDir, $SolutionDir)
-$ReleaseFilesDir = "$PSScriptRoot\ReleaseFiles"
-$ManifestFilePath = "$ReleaseFilesDir\manifest_Template.json"
+### Error codes
+##
+## 2 - Release files do not exist.
+## Files should automatically be copied to a folder "ReleaseFiles". Fill the config out at a minumum.
+## 
+## 3 - PluginDescription is too long. Must be less than 250 characters.
+##
+## 4 - GUID Auto Fill - Plugin name needs to exist.
+##
+## 5 - Changelog does not contain an entry for the current plugin version.
+##
+## 6 - icon.png does not exist in ReleaseFiles.
+##
+## 50 - Debug error, you should never see this in a released version.
+
+
+### Parameters input by commandline.
+param ($OutputDir, $SolutionDir, $ProjectDir)
+
+$DefaultReadmeFilePath = "$PSScriptRoot\DefaultFiles\README_Template.md"
+$DefaultConfigFilePath = "$PSScriptRoot\DefaultFiles\PluginInfo.config"
+
+$ReleaseFilesDir = $ProjectDir + "ReleaseFiles"
 $ReadmeFilePath = "$ReleaseFilesDir\README_Template.md"
+$ConfigFilePath = "$ReleaseFilesDir\PluginInfo.config"
 $ChangelogFilePath = "$ReleaseFilesDir\CHANGELOG.md"
 $IconFilePath = "$ReleaseFilesDir\icon.png"
-$CSInfoFilePath = "$PSScriptRoot\MyPluginInfo.cs"
-$ConfigFilePath = "$PSScriptRoot\ReleaseFiles\ReleaseConfig.config"
+
+$CSInfoFilePath = $ProjectDir + "MyPluginInfo.cs"
 
 
-### Sets XML text, Creates XML entry if non-existant. Requires CSProjXML var set
+### Check Template and config files exist
+$FailCheck = $false
+if (-not (Test-Path $ReadmeFilePath))
+{
+    Copy-Item $DefaultReadmeFilePath -Destination $ReadmeFilePath -Force
+    Write-Output "PreBuild : Error 2 : Release file does not exist. A file has been created at $ReadmeFilePath, please configure."
+    $FailCheck = $true
+}
+
+if (-not (Test-Path $ConfigFilePath))
+{
+    Copy-Item $DefaultConfigFilePath -Destination $ConfigFilePath -Force 
+    Write-Output "PreBuild : Error 2 : Release file does not exist. A file has been created at $ConfigFilePath, please configure."
+    $FailCheck = $true
+}
+
+if($FailCheck)
+{
+    Exit 2
+}
+
+
+
+### Script Functions
+
+## Sets XML text, Creates XML entry if non-existant. Requires CSProjXML var set
 function Set-XMLText
 {
     param ( $ParentPath, $NodeName, $Text )
@@ -42,8 +88,8 @@ function Set-XMLText
     }
 }
 
-### Simple INI reader. Credit to https://devblogs.microsoft.com/scripting/use-powershell-to-work-with-any-ini-file/
-function Get-IniContent ($FilePath)
+## Simple Config reader. Credit to https://devblogs.microsoft.com/scripting/use-powershell-to-work-with-any-ini-file/
+function Get-ConfigContent ($FilePath)
 {
     $ini = @{}
     switch -regex -File $FilePath
@@ -70,9 +116,9 @@ function Get-IniContent ($FilePath)
     return $ini
 }
 
-$ConfigData = Get-IniContent($ConfigFilePath)
 
-
+### Load config data from .config file.
+$ConfigData = Get-ConfigContent($ConfigFilePath)
 
 ### Input Vars
 
@@ -113,8 +159,6 @@ $ThunderstoreID = $ConfigData["ReleaseProperties"]["ThunderstoreID"]
 [string]$DependencyStrings = $ConfigData["ReleaseProperties"]["DependencyStrings"]
 
 
-
-
 ## PreBuild Execution Params
 
 # README output path for github readme. 
@@ -127,8 +171,17 @@ if ($ProjectReadmeFileOutPath -eq "SolutionDir")
 }
 elseif($ProjectReadmeFileOutPath -eq "ProjectDir")
 {
-    $ProjectReadmeFileOutPath = "$PSScriptRoot\README.md"
+    $ProjectReadmeFileOutPath = "$ProjectDir\README.md"
 }
+elseif($ProjectReadmeFileOutPath.StartsWith("ProjectDir"))
+{
+    $ProjectReadmeFileOutPath.Replace("ProjectDir", $ProjectDir)
+}
+elseif($ProjectReadmeFileOutPath.StartsWith("SolutionDir"))
+{
+    $ProjectReadmeFileOutPath.Replace("SolutionDir", $ProjectDir)
+}
+
 
 # Throw error if icon.png does not exist.
 $IconError = $ConfigData["PrebuildExecParams"]["IconError"] -eq "True"
@@ -153,21 +206,15 @@ if(-not $PluginDescription) { $PluginDescription = $PluginName }
 # Exit early if description is too long
 if($PluginDescription.Length -gt 250)
 {
-	Write-Warning "PluginDescription is too long. Must be less than 250 characters."
-	Exit 2
-}
-
-# Thunderstore Plugin Name
-if(-not $ThunderstorePluginName)
-{
-    $ThunderstorePluginName = $UserPluginName.Replace(" ", "_")
+    Write-Output "PreBuild : Error 3 : PluginDescription is too long. Must be less than 250 characters."
+	Exit 3
 }
 
 
 ### Update .csproj file.
 Write-Output "Updating CSProj file..."
 
-$CSProjDir = (@(Get-ChildItem -Path ($PSScriptRoot + "\*.csproj"))[0])
+$CSProjDir = (@(Get-ChildItem -Path ($ProjectDir + "\*.csproj"))[0])
 $CSProjXML = [xml](Get-Content -Path $CSProjDir.FullName)
 
 # Set Version
@@ -189,8 +236,8 @@ else { $AssemblyNameXMLNode.InnerText = $PluginName }
 # Set File Description
 Set-XMLText "//Project/PropertyGroup" "AssemblyTitle" $PluginDescription
 
-# Set Extra File Description.
-Set-XMLText "//Project/PropertyGroup" "Description" $PluginDescription
+# Set Extra File Description. - Disabled, as some users may not want this. If desired, it can be re-enabled or a config setting can be added.
+# Set-XMLText "//Project/PropertyGroup" "Description" $PluginDescription
 
 
 $CSProjXML.Save($CSProjDir.FullName)
@@ -202,6 +249,11 @@ $CSProjXML.Save($CSProjDir.FullName)
 if(-Not $UserPluginName)
 {
 	$UserPluginName = $PluginName
+}
+# Thunderstore Plugin Name auto-fill. Run after UserPluginName auto-fill.
+if(-not $ThunderstorePluginName)
+{
+    $ThunderstorePluginName = $UserPluginName.Replace(" ", "_")
 }
 
 
@@ -217,8 +269,8 @@ else
 {
     if(-not $PluginOriginalAuthor)
     {
-        Write-Warning "Original Author must be filled in if using GUID auto-fill."
-        Exit 5
+        Write-Output "PreBuild : Error 4 : Original Author must be filled in if using GUID auto-fill."
+        Exit 4
     }
 	$InfoFileContent += "`r`n        public const string PLUGIN_GUID = $`"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}`";"
 }
@@ -292,11 +344,12 @@ if(Test-Path -Path $ChangelogFilePath)
     $ChangelogData = Get-Content -Path $ChangelogFilePath
     if(-Not $ChangelogData.Contains("## $PluginVersion"))
     {
-        Write-Warning "Changelog does not contain an entry for the current plugin version"
     	if($ChangelogError)
     	{
-    		Exit 3
+            Write-Output "PreBuild : Error 5 : Changelog does not contain an entry for the current plugin version."
+    		Exit 5
     	}
+        Write-Output "PreBuild : Warning 5 : Changelog does not contain an entry for the current plugin version."
     }
 
     Copy-Item -Path $ChangelogFilePath -Destination $OutputDir
@@ -312,11 +365,15 @@ if(Test-Path $IconFilePath)
 }
 else
 {
-	Write-Warning "icon.png does not exist in ReleaseFiles."
 	if($IconError)
 	{
-		Exit 4
+        Write-Output "PreBuild : Error 6 : icon.png does not exist in ReleaseFiles."
+		Exit 6
 	}
+    else
+    {
+        Write-Output "PreBuild : Warning 6 : icon.png does not exist in ReleaseFiles."
+    }
 }
 
 Write-Host "PreBuild Complete!"

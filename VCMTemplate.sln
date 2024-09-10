@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCMTemplate", "VCMTemplate\VCMTemplate.csproj", "{22D5FF86-3482-4945-97B4-AAC0E20E68CC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCMT.Thunderstore.DocBuilder", "VCMT.DocBuilder\VCMT.Thunderstore.DocBuilder.csproj", "{DAD479A6-04A7-4006-95AD-DB98D3CD3948}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{22D5FF86-3482-4945-97B4-AAC0E20E68CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22D5FF86-3482-4945-97B4-AAC0E20E68CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22D5FF86-3482-4945-97B4-AAC0E20E68CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
