@@ -5,7 +5,7 @@
 ### Written by Dragon of VoidCrewModdingTeam.
 ### Modified by: 
 ###
-### Script Version 1.1.2
+### Script Version 1.1.3
 ###
 ###
 ### This script was created for auto-generation/fill of release files for Void Crew mods.
