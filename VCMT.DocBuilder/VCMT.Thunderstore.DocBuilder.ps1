@@ -265,7 +265,7 @@ if(-not $ThunderstorePluginName)
 ### Create/Update MyPluginInfo.cs
 Write-Output "Auto-Filling MyPluginInfo.cs..."
 
-$InfoFileContent = "#pragma warning disable CS1591`r`namespace $DefaultNamespace`r`n{`r`n    //Auto-Generated File. Created by PreBuild.ps1`r`n    public class MyPluginInfo`r`n    {"
+$InfoFileContent = "#pragma warning disable CS1591`r`nnamespace $DefaultNamespace`r`n{`r`n    //Auto-Generated File. Created by PreBuild.ps1`r`n    public class MyPluginInfo`r`n    {"
 if($GUID)
 {
 	$InfoFileContent += "`r`n        public const string PLUGIN_GUID = `"" + $GUID + "`";"
