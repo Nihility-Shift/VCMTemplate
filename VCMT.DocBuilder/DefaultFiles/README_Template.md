@@ -28,7 +28,8 @@ Requires: [Dependencies]
 - ✅ Host
   - Only the host needs this mod.
 - ✅ Session
-  - Requires the room to be marked as Mod_Session.
+  - Requires the room to be marked as Mod_Session for functionality.
+  - Requires the room to be marked as Mod_Session for joining.
 - ✅ All
   - All players must have this mod installed.
 
