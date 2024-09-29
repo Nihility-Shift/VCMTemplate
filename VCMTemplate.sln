@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCMTemplate", "VCMTemplate\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCMT.Thunderstore.DocBuilder", "VCMT.DocBuilder\VCMT.Thunderstore.DocBuilder.csproj", "{DAD479A6-04A7-4006-95AD-DB98D3CD3948}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoidCrew.GameLibs", "VoidCrew.GameLibs\VoidCrew.GameLibs.csproj", "{701B9C68-2AD9-45FC-96F7-E48615D668B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAD479A6-04A7-4006-95AD-DB98D3CD3948}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701B9C68-2AD9-45FC-96F7-E48615D668B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701B9C68-2AD9-45FC-96F7-E48615D668B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701B9C68-2AD9-45FC-96F7-E48615D668B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701B9C68-2AD9-45FC-96F7-E48615D668B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
