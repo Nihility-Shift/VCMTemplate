@@ -2,6 +2,7 @@
 using BepInEx.Logging;
 using HarmonyLib;
 using System.Reflection;
+using VoidManager;
 using VoidManager.MPModChecks;
 
 namespace VCMTemplate
@@ -22,7 +23,7 @@ namespace VCMTemplate
     }
 
 
-    public class VoidManagerPlugin : VoidManager.VoidPlugin
+    public class VoidManagerPlugin : VoidPlugin
     {
         public override MultiplayerType MPType => MultiplayerType.All;
 
