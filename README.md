@@ -1,5 +1,5 @@
 # VCMT's Doc Builder
-This project helps fill in version data for files used/required for a Thunderstore release.
+This project helps fill in version data and zip files used/required for a Thunderstore release.
 - CHANGELOG.md
   - Verifies a changelog has an entry of the corrosponding version. Can be configured to throw an error if the version is not found.
 - README.md
@@ -41,7 +41,7 @@ an icon.png file or the CHANGELOG.md does not contain '## [PluginVersion]' where
 
 On failure, the script will fail to run and an error will be provided in the VS error list.
 
-2 common error you may see in Visual studio, which are caused by building while the .config file is open:
+2 common errors you may see in Visual studio, which are caused by building while the .config file is open:
 - "XML document must contain a root level element."
 - "Invalid token 'Text' at root level of document."  
 

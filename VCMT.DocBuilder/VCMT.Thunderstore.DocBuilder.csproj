@@ -2,7 +2,7 @@
 	<PropertyGroup>
 	  <PackageId>VCMT.Thunderstore.DocBuilder</PackageId>
 	  <!-- Update DocBuilder.Props when incrimenting version. If someone has a better solution, lmk. -->
-	  <Version>0.1.4</Version>
+	  <Version>0.2.0</Version>
 	  <Authors>Void Crew Modding Team</Authors>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageProjectUrl>https://github.com/Void-Crew-Modding-Team/VCMTemplate</PackageProjectUrl>
@@ -25,7 +25,7 @@ Originally intended for Void Crew modding where I found myself managing various 
 	<ItemGroup>
 	  <Content Include="VCMT.Thunderstore.DocBuilder.props" />
       <Content Include="VCMT.Thunderstore.DocBuilder.ps1" />
-			<Content Include="VCMT.Thunderstore.ZipBuilder.ps1" />
+	  <Content Include="VCMT.Thunderstore.ZipBuilder.ps1" />
 	  <Content Include="DefaultFiles\CHANGELOG.md" />
 	  <Content Include="DefaultFiles\PluginInfo.config" />
 	  <Content Include="DefaultFiles\README_Template.md" />
