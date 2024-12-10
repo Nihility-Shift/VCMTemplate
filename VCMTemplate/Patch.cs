@@ -7,7 +7,7 @@ namespace VCMTemplate
     {
         static void Postfix()
         {
-            Plugins.Log.LogInfo("Example Patch Executed");
+            BepinPlugin.Log.LogInfo("Example Patch Executed");
         }
     }
 }
