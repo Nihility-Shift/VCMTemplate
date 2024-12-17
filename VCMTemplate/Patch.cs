@@ -1,8 +1,9 @@
-﻿using HarmonyLib;
+﻿using CG.Client.UI;
+using HarmonyLib;
 
 namespace VCMTemplate
 {
-    [HarmonyPatch(typeof(MainMenu), "Start")]
+    [HarmonyPatch(typeof(FadeController), "Start")]
     class Patch
     {
         static void Postfix()
