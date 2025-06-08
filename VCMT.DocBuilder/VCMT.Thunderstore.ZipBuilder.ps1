@@ -1,9 +1,9 @@
 ###
-### Void Crew Modding DocBuilder Script
+### Void Crew Modding ZipBuilder Script
 ### For general modding usage
 ###
 ### Written by Dragon of VoidCrewModdingTeam.
-### Modified by: 
+### Modified by:
 ###
 ### Script Version 1.2.1
 ###
@@ -16,7 +16,7 @@
 ##
 ## 2 - Release files do not exist.
 ## Files should automatically be copied to a folder "ReleaseFiles". Fill the config out at a minumum.
-## 
+##
 ## 3 - PluginDescription is too long. Must be less than 250 characters.
 ##
 ## 4 - GUID Auto Fill - Plugin name needs to exist.
@@ -31,16 +31,18 @@
 ### Parameters input by commandline.
 param ($OutputDir, $SolutionDir, $ProjectDir)
 
-$DefaultReadmeFilePath = "$PSScriptRoot\DefaultFiles\README_Template.md"
-$DefaultConfigFilePath = "$PSScriptRoot\DefaultFiles\PluginInfo.config"
+$DefaultFilesDir = Join-Path $PSScriptRoot "DefaultFiles"
+$ReleaseFilesDir = Join-Path $ProjectDir "ReleaseFiles"
 
-$ReleaseFilesDir = $ProjectDir + "ReleaseFiles"
-$ReadmeFilePath = "$ReleaseFilesDir\README_Template.md"
-$ConfigFilePath = "$ReleaseFilesDir\PluginInfo.config"
-$ChangelogFilePath = "$ReleaseFilesDir\CHANGELOG.md"
-$IconFilePath = "$ReleaseFilesDir\icon.png"
+$DefaultReadmeFilePath = Join-Path $DefaultFilesDir "README_Template.md"
+$DefaultConfigFilePath = Join-Path $DefaultFilesDir "PluginInfo.config"
 
-$CSInfoFilePath = $ProjectDir + "MyPluginInfo.cs"
+$ReadmeFilePath = Join-Path $ReleaseFilesDir "README_Template.md"
+$ConfigFilePath = Join-Path $ReleaseFilesDir "PluginInfo.config"
+$ChangelogFilePath = Join-Path $ReleaseFilesDir "CHANGELOG.md"
+$IconFilePath = Join-Path $ReleaseFilesDir "icon.png"
+
+$CSInfoFilePath = Join-Path $ProjectDir "MyPluginInfo.cs"
 
 ### Script Functions
 
@@ -123,7 +125,8 @@ Write-Output "Starting Postbuild..."
 ### Update .csproj file.
 Write-Output "Reading CSProj file..."
 
-$CSProjDir = (@(Get-ChildItem -Path ($ProjectDir + "\*.csproj"))[0])
+$CSProjPath = Join-Path $ProjectDir "*.csproj"
+$CSProjDir = (@(Get-ChildItem -Path $CSProjPath)[0])
 $CSProjXML = [xml](Get-Content -Path $CSProjDir.FullName)
 
 # Set AssemblyName
@@ -138,22 +141,33 @@ if(-Not $PluginName) { $PluginName = $AssemblyNameXMLNode.InnerText }
 if ($BuildZip -and $PluginVersion)
 {
     Write-Output "Building Zip file..."
-    [System.IO.Directory]::CreateDirectory("$OutputDir\Releases")
-    Compress-Archive -Path "$OutputDir\README.md", "$OutputDir\CHANGELOG.md", "$OutputDir\manifest.json", "$OutputDir$PluginName.dll"   -DestinationPath "$OutputDir\Releases\$PluginName-$PluginVersion.zip" -Force
+    $ReleasesDir = Join-Path $OutputDir "Releases"
+    [System.IO.Directory]::CreateDirectory($ReleasesDir)
+
+    $ReadmeOutput = Join-Path $OutputDir "README.md"
+    $ChangelogOutput = Join-Path $OutputDir "CHANGELOG.md"
+    $ManifestOutput = Join-Path $OutputDir "manifest.json"
+    $PluginDllOutput = Join-Path $OutputDir "$PluginName.dll"
+
+    $ZipFileName = "$PluginName-$PluginVersion.zip"
+    $DestinationZipPath = Join-Path $ReleasesDir $ZipFileName
+
+    Compress-Archive -Path $ReadmeOutput, $ChangelogOutput, $ManifestOutput, $PluginDllOutput -DestinationPath $DestinationZipPath -Force
 
     ## icon file
     Write-Output "Copying icon.png..."
     if(Test-Path $IconFilePath)
     {
-        Compress-Archive -Path "$OutputDir\icon.png" -DestinationPath "$OutputDir\Releases\$PluginName-$PluginVersion.zip" -Update
+        $IconOutput = Join-Path $OutputDir "icon.png"
+        Compress-Archive -Path $IconOutput -DestinationPath $DestinationZipPath -Update
     }
     else
     {
-	    if($IconError)
-	    {
+        if($IconError)
+        {
             Write-Output "PostBuild : Error 6 : icon.png does not exist in ReleaseFiles."
-		    Exit 6
-	    }
+            Exit 6
+        }
         else
         {
             Write-Output "PostBuild : Warning 6 : icon.png does not exist in ReleaseFiles."
