@@ -3,7 +3,7 @@
 ### For general modding usage
 ###
 ### Written by Dragon of VoidCrewModdingTeam.
-### Modified by: 
+### Modified by:
 ###
 ### Script Version 1.2.1
 ###
@@ -16,7 +16,7 @@
 ##
 ## 2 - Release files do not exist.
 ## Files should automatically be copied to a folder "ReleaseFiles". Fill the config out at a minumum.
-## 
+##
 ## 3 - PluginDescription is too long. Must be less than 250 characters.
 ##
 ## 4 - GUID Auto Fill - Plugin name needs to exist.
@@ -31,16 +31,17 @@
 ### Parameters input by commandline.
 param ($OutputDir, $SolutionDir, $ProjectDir)
 
-$DefaultReadmeFilePath = "$PSScriptRoot\DefaultFiles\README_Template.md"
-$DefaultConfigFilePath = "$PSScriptRoot\DefaultFiles\PluginInfo.config"
+$DefaultFilesDir = Join-Path $PSScriptRoot "DefaultFiles"
+$DefaultReadmeFilePath = Join-Path $DefaultFilesDir "README_Template.md"
+$DefaultConfigFilePath = Join-Path $DefaultFilesDir "PluginInfo.config"
 
-$ReleaseFilesDir = $ProjectDir + "ReleaseFiles"
-$ReadmeFilePath = "$ReleaseFilesDir\README_Template.md"
-$ConfigFilePath = "$ReleaseFilesDir\PluginInfo.config"
-$ChangelogFilePath = "$ReleaseFilesDir\CHANGELOG.md"
-$IconFilePath = "$ReleaseFilesDir\icon.png"
+$ReleaseFilesDir = Join-Path $ProjectDir "ReleaseFiles"
+$ReadmeFilePath = Join-Path $ReleaseFilesDir "README_Template.md"
+$ConfigFilePath = Join-Path $ReleaseFilesDir "PluginInfo.config"
+$ChangelogFilePath = Join-Path $ReleaseFilesDir "CHANGELOG.md"
+$IconFilePath = Join-Path $ReleaseFilesDir "icon.png"
 
-$CSInfoFilePath = $ProjectDir + "MyPluginInfo.cs"
+$CSInfoFilePath = Join-Path $ProjectDir "MyPluginInfo.cs"
 
 
 ### Check Template and config files exist
@@ -59,7 +60,7 @@ if (-not (Test-Path $ReadmeFilePath))
 
 if (-not (Test-Path $ConfigFilePath))
 {
-    Copy-Item $DefaultConfigFilePath -Destination $ConfigFilePath -Force 
+    Copy-Item $DefaultConfigFilePath -Destination $ConfigFilePath -Force
     Write-Output "PreBuild : Error 2 : Release file does not exist. A file has been created at $ConfigFilePath, please configure."
     $FailCheck = $true
 }
@@ -166,25 +167,25 @@ $ThunderstoreID = $ConfigData["ReleaseProperties"]["ThunderstoreID"]
 
 ## PreBuild Execution Params
 
-# README output path for github readme. 
+# README output path for github readme.
 # For output to project dir, use: "$PSScriptRoot\README.md"
 # For output to solution Dir, use: "$SolutionDir\README.md"
 $ProjectReadmeFileOutPath = $ConfigData["PrebuildExecParams"]["ProjectReadmeOutPath"]
 if ($ProjectReadmeFileOutPath -eq "SolutionDir")
 {
-    $ProjectReadmeFileOutPath = "$SolutionDir\README.md"
+    $ProjectReadmeFileOutPath = Join-Path $SolutionDir "README.md"
 }
 elseif($ProjectReadmeFileOutPath -eq "ProjectDir")
 {
-    $ProjectReadmeFileOutPath = "$ProjectDir\README.md"
+    $ProjectReadmeFileOutPath = Join-Path $ProjectDir "README.md"
 }
 elseif($ProjectReadmeFileOutPath.StartsWith("ProjectDir"))
 {
-    $ProjectReadmeFileOutPath.Replace("ProjectDir", $ProjectDir)
+    $ProjectReadmeFileOutPath = $ProjectReadmeFileOutPath.Replace("ProjectDir", $ProjectDir)
 }
 elseif($ProjectReadmeFileOutPath.StartsWith("SolutionDir"))
 {
-    $ProjectReadmeFileOutPath.Replace("SolutionDir", $ProjectDir)
+    $ProjectReadmeFileOutPath = $ProjectReadmeFileOutPath.Replace("SolutionDir", $ProjectDir)
 }
 
 
@@ -219,7 +220,8 @@ if($PluginDescription.Length -gt 250)
 ### Update .csproj file.
 Write-Output "Updating CSProj file..."
 
-$CSProjDir = (@(Get-ChildItem -Path ($ProjectDir + "\*.csproj"))[0])
+$CSProjPath = Join-Path $ProjectDir "*.csproj"
+$CSProjDir = (@(Get-ChildItem -Path $CSProjPath)[0])
 $CSProjXML = [xml](Get-Content -Path $CSProjDir.FullName)
 
 # Set Version
@@ -279,8 +281,8 @@ else
     }
 	$InfoFileContent += "`r`n        public const string PLUGIN_GUID = $`"{PLUGIN_ORIGINAL_AUTHOR}.{PLUGIN_NAME}`";"
 }
-$InfoFileContent += "`r`n        public const string PLUGIN_NAME = `"" + $PluginName + "`";" 
-$InfoFileContent += "`r`n        public const string USERS_PLUGIN_NAME = `"" + $UserPluginName + "`";" 
+$InfoFileContent += "`r`n        public const string PLUGIN_NAME = `"" + $PluginName + "`";"
+$InfoFileContent += "`r`n        public const string USERS_PLUGIN_NAME = `"" + $UserPluginName + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_VERSION = `"" + $PluginVersion + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_DESCRIPTION = `"" + $PluginDescription + "`";"
 $InfoFileContent += "`r`n        public const string PLUGIN_ORIGINAL_AUTHOR = `"" + $PluginOriginalAuthor + "`";"
@@ -301,8 +303,8 @@ Write-Output "Starting work on Template Files..."
 Write-Output "Updating manifiest.json..."
 
 $Dependencies = $DependencyStrings.Split(',').Trim();
-if ($Dependencies.GetType().Name -eq "String") 
-{ 
+if ($Dependencies.GetType().Name -eq "String")
+{
     $Dependencies = @($Dependencies)
 }
 $ManifestData = [ordered]@{
@@ -312,7 +314,8 @@ $ManifestData = [ordered]@{
     website_url = $WebpageLink
     dependencies = $Dependencies
 }
-ConvertTo-Json $ManifestData | % { [System.Text.RegularExpressions.Regex]::Unescape($_) } | Out-File -FilePath "$OutputDir\manifest.json" -Encoding UTF8
+$ManifestOutputPath = Join-Path $OutputDir "manifest.json"
+ConvertTo-Json $ManifestData | % { [System.Text.RegularExpressions.Regex]::Unescape($_) } | Out-File -FilePath $ManifestOutputPath -Encoding UTF8
 
 
 ## README file
@@ -333,8 +336,9 @@ $ReadmeData = $ReadmeData.Replace("[Description]", $PluginDescription)
 # $ReadmeData | Out-File -FilePath "$OutputDir\README.md" -Encoding utf8
 
 # Write README to Output folder
+$ReadmeOutputPath = Join-Path $OutputDir "README.md"
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-[System.IO.File]::WriteAllLines("$OutputDir\README.md", $ReadmeData, $Utf8NoBomEncoding)
+[System.IO.File]::WriteAllLines($ReadmeOutputPath, $ReadmeData, $Utf8NoBomEncoding)
 
 # Write 2nd README to Project Output folder for github
 if($ProjectReadmeFileOutPath)
@@ -360,8 +364,8 @@ if(Test-Path -Path $ChangelogFilePath)
     	}
         Write-Output "PreBuild : Warning 5 : Changelog does not contain an entry for the current plugin version."
     }
-
-    Copy-Item -Path $ChangelogFilePath -Destination $OutputDir
+    $ChangelogOutputDest = Join-Path $OutputDir (Split-Path $ChangelogFilePath -Leaf)
+    Copy-Item -Path $ChangelogFilePath -Destination $ChangelogOutputDest
 }
 
 
@@ -370,7 +374,8 @@ if(Test-Path -Path $ChangelogFilePath)
 Write-Output "Copying icon.png..."
 if(Test-Path $IconFilePath)
 {
-    Copy-Item -Path $IconFilePath -Destination $OutputDir
+    $IconOutputDest = Join-Path $OutputDir (Split-Path $IconFilePath -Leaf)
+    Copy-Item -Path $IconFilePath -Destination $IconOutputDest
 }
 else
 {
