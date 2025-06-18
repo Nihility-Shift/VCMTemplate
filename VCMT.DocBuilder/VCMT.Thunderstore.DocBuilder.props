@@ -1,37 +1,17 @@
 <Project>
-  <PropertyGroup>
-    <RunVCMTDocBuilder Condition="'$(RunVCMTDocBuilder)' == ''">true</RunVCMTDocBuilder>
-
-    <!--  Look up the scripts in the same directory as this file. -->
-    <PreBuildScript>$(MSBuildThisFileDirectory)VCMT.Thunderstore.DocBuilder.ps1</PreBuildScript>
-    <PostBuildScript>$(MSBuildThisFileDirectory)VCMT.Thunderstore.ZipBuilder.ps1</PostBuildScript>
-
-    <!-- Use 'pwsh' for Unix-like systems (Linux, macOS). -->
-    <PowerShellExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">pwsh</PowerShellExe>
-    
-    <!-- For Windows, use the traditional Windows PowerShell path. -->
-    <PowerShellExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
-  </PropertyGroup>
-
-  <!-- Check prerequisites before executing the pre-build script. -->
-  <Target Name="ValidateDocBuilderPrerequisites" BeforeTargets="ExecPreBuild">
-    <Error Condition="!Exists('$(PreBuildScript)')" 
-           Text="The VCMT.Thunderstore.DocBuilder pre-build script was not found at '$(PreBuildScript)'." />
-    <Error Condition="!Exists('$(PostBuildScript)')" 
-           Text="The VCMT.Thunderstore.DocBuilder post-build script was not found at '$(PostBuildScript)'." />
-    <Error Condition="$([MSBuild]::IsOSPlatform('Windows')) AND !Exists('$(PowerShellExe)')"
-           Text="Windows PowerShell was not found at the expected path: '$(PowerShellExe)'. Please ensure it is installed correctly." />
-    <Error Condition="!$([MSBuild]::IsOSPlatform('Windows')) AND '$([MSBuild]::FindUnderPath($(PowerShellExe), $(PATH)))' == ''"
-           Text="PowerShell Core ('pwsh') was not found in the system's PATH. Please install PowerShell and ensure 'pwsh' is accessible." />
-  </Target>
-  
-  <!-- Execute the pre-build and post-build scripts. -->
-  <Target Name="ExecPreBuild" BeforeTargets="PreEvent">
-    <Message Text="Executing Pre-Build Script: $(PreBuildScript)" Importance="high" />
-    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -file &quot;$(PreBuildScript)&quot; &quot;$(OutDir)&quot; &quot;$(SolutionDir)&quot; &quot;$(ProjectDir)&quot;" />
+  <!-- Utilized PS script execution info from https://learn.microsoft.com/en-us/aspnet/web-forms/overview/deployment/advanced-enterprise-web-deployment/running-windows-powershell-scripts-from-msbuild-project-files -->
+  <Target Name="ExecPreBuild" BeforeTargets="PreBuildEvent">
+    <PropertyGroup>
+      <PowerShellExe Condition="!$([MSBuild]::IsOSPlatform('Windows'))">pwsh</PowerShellExe>
+      <PowerShellExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>	    <!-- Update DocBuilder.Props when incrimenting version. If someone has a better solution, lmk. -->
+      <ScriptLocation Condition=" '$(ScriptLocation)'=='' ">$(MSBuildThisFileDirectory)\VCMT.Thunderstore.DocBuilder.ps1</ScriptLocation>
+    </PropertyGroup>
+    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -file &quot;$(ScriptLocation)&quot; &quot;$(OutDir)&quot; &quot;$(SolutionDir)&quot; &quot;$(ProjectDir)&quot;" />
   </Target>
   <Target Name="ExecPostBuild" AfterTargets="Build">
-    <Message Text="Executing Post-Build Script: $(PostBuildScript)" Importance="high" />
-	  <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -file &quot;$(PostBuildScript)&quot; &quot;$(OutDir)&quot; &quot;$(SolutionDir)&quot; &quot;$(ProjectDir)&quot;" />
+    <PropertyGroup>
+      <ScriptLocation Condition=" '$(ZipScriptLocation)'=='' ">$(MSBuildThisFileDirectory)\VCMT.Thunderstore.ZipBuilder.ps1</ScriptLocation>
+    </PropertyGroup>
+    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -file &quot;$(ScriptLocation)&quot; &quot;$(OutDir)&quot; &quot;$(SolutionDir)&quot; &quot;$(ProjectDir)&quot;" />
   </Target>
 </Project>
