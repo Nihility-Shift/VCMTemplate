@@ -31,6 +31,11 @@
 ### Parameters input by commandline.
 param ($OutputDir, $SolutionDir, $ProjectDir)
 
+# print variables
+Write-Output "OutputDir: $OutputDir"
+Write-Output "SolutionDir: $SolutionDir"
+Write-Output "ProjectDir: $ProjectDir"
+
 $DefaultFilesDir = Join-Path $PSScriptRoot "DefaultFiles"
 $ReleaseFilesDir = Join-Path $ProjectDir "ReleaseFiles"
 
