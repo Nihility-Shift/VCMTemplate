@@ -1,12 +1,12 @@
-name: Build VCMTemplate with Local DocBuilder
+name: Test DocBuilder and VCMTemplate
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main, master ]
   pull_request:
 
 jobs:
-  build:
+  test:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -14,45 +14,72 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: Build VCMT.DocBuilder
-      run: dotnet build VCMT.DocBuilder/VCMT.Thunderstore.DocBuilder.csproj --configuration Release
+      # Build DocBuilder
+      - name: Override DocBuilder version to a non-existing version
+        shell: bash
+        run: |
+          DOCBUILDER_VERSION=9.9.9
 
-    - name: Add local build to NuGet sources
-      run: dotnet nuget add source "`pwd`/VCMT.DocBuilder/bin/Release" -n local-build
+          # update VCMT.DocBuilder
+          sed -i "s|\(<Version>\)[^<]*\(</Version>\)|\1$DOCBUILDER_VERSION\2|" VCMT.DocBuilder/VCMT.Thunderstore.DocBuilder.csproj
 
-    - name: Create required files
-      run: |
-        touch VCMTemplate/ReleaseFiles/icon.png
-    
-    - name: Update VCMTemplate to use local DocBuilder
-      run: |
-        # extract DocBuilder version from the DocBuilder project file
-        DOCBUILDER_VERSION=$(grep -oP '(?<=<Version>)[^<]+' VCMT.DocBuilder/VCMT.Thunderstore.DocBuilder.csproj)
+          # update VCMTemplate
+          sed -i "s|\(<PackageReference Include=\"VCMT.Thunderstore.DocBuilder\" Version=\"\)[^\"]*\(\".*/>\)|\1$DOCBUILDER_VERSION\2|" VCMTemplate/VCMTemplate.csproj
 
-        # update the VCMTemplate project file to use the local DocBuilder version
-        sed -i "s|\(<PackageReference Include=\"VCMT.Thunderstore.DocBuilder\" Version=\"\)[^\"]*\(\".*/>\)|\1$DOCBUILDER_VERSION\2|" VCMTemplate/VCMTemplate.csproj
+      - name: Build VCMT.DocBuilder
+        run: |
+          dotnet build VCMT.DocBuilder/VCMT.Thunderstore.DocBuilder.csproj --configuration Release
+      
+      - name: List DocBuilder build output
+        shell: bash
+        run: |
+          ls -lR VCMT.DocBuilder/bin/Release
 
-    - name: Build VCMTemplate with local DocBuilder reference
-      run: dotnet build VCMTemplate/VCMTemplate.csproj
+      # Build VCMTemplate with local DocBuilder reference
+      - name: Add local build to NuGet sources
+        run: dotnet nuget add source "${{ github.workspace }}/VCMT.DocBuilder/bin/Release" -n local-build
+      
+      - name: Fill in required fields
+        shell: bash
+        run: |
+          PLUGIN_INFO_FILE="VCMTemplate/ReleaseFiles/PluginInfo.config"
+          sed -i "s|PluginName=.*|PluginName=VCMTemplate|" "$PLUGIN_INFO_FILE"
+          sed -i "s|PluginOriginalAuthor=.*|PluginOriginalAuthor=NihilityShift|" "$PLUGIN_INFO_FILE"
+          sed -i "s|PluginVersion=.*|PluginVersion=1.0.0|" "$PLUGIN_INFO_FILE"
+          cat "$PLUGIN_INFO_FILE"
+          touch VCMTemplate/ReleaseFiles/icon.png
 
-    - name: Upload DocBuilder artifacts
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: VCMT.DocBuilder-Build
-        path: VCMT.DocBuilder/bin/Debug/
+      - name: Build VCMTemplate
+        run: |
+          dotnet build VCMTemplate/VCMTemplate.csproj
+      
+      - name: List VCMTemplate build output
+        shell: bash
+        run: |
+          ls -lR VCMTemplate/bin/Debug/net472
+          # check whether output zip exists
+          if [ ! -f VCMTemplate/bin/Debug/net472/Releases/VCMTemplate-1.0.0.zip ]; then
+            echo "Error: VCMTemplate output zip not found!"
+            exit 1
+          fi
+      
+      # Upload artifacts
+      - name: Upload DocBuilder artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VCMT.DocBuilder-Build-${{ matrix.os }}
+          path: VCMT.DocBuilder/bin/Release/
 
-    - name: Upload VCMTemplate artifacts
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v4
-      with:
-        name: VCMTemplate-Build
-        path: VCMTemplate/bin/Debug/net472
+      - name: Upload VCMTemplate artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: VCMTemplate-Build-${{ matrix.os }}
+          path: VCMTemplate/bin/Debug/net472
