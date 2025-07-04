@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.Build.NoTargets/3.7.56">
 	<PropertyGroup>
 	  <PackageId>VCMT.Thunderstore.DocBuilder</PackageId>
-	  <Version>0.2.3</Version>
+	  <Version>0.2.4</Version>
 	  <Authors>Void Crew Modding Team</Authors>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageProjectUrl>https://github.com/Void-Crew-Modding-Team/VCMTemplate</PackageProjectUrl>

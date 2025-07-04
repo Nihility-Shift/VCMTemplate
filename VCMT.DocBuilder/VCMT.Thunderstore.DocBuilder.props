@@ -6,12 +6,12 @@
       <PowerShellExe Condition="$([MSBuild]::IsOSPlatform('Windows'))">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
       <ScriptLocation>$(MSBuildThisFileDirectory)\VCMT.Thunderstore.DocBuilder.ps1</ScriptLocation>
     </PropertyGroup>
-    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -Command &quot;&amp; { &amp; '$(ScriptLocation)' '$(OutDir)' '$(MSBuildThisFileDirectory)' '$(ProjectDir)' }&quot;" />
+    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -Command &quot;&amp; { &amp; '$(ScriptLocation)' '$(OutDir)' '$(SolutionDir)' '$(ProjectDir)' }&quot;" />
   </Target>
   <Target Name="ExecPostBuild" AfterTargets="Build">
     <PropertyGroup>
       <ScriptLocation>$(MSBuildThisFileDirectory)\VCMT.Thunderstore.ZipBuilder.ps1</ScriptLocation>
     </PropertyGroup>
-    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -Command &quot;&amp; { &amp; '$(ScriptLocation)' '$(OutDir)' '$(MSBuildThisFileDirectory)' '$(ProjectDir)' }&quot;" />
+    <Exec Command="$(PowerShellExe) -NonInteractive -executionpolicy Unrestricted -NoProfile -Command &quot;&amp; { &amp; '$(ScriptLocation)' '$(OutDir)' '$(SolutionDir)' '$(ProjectDir)' }&quot;" />
   </Target>
 </Project>
